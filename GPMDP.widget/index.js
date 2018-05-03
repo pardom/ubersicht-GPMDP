@@ -1,6 +1,6 @@
 command: "cat ~/Library/Application\\ Support/Google\\ Play\\ Music\\ Desktop\\ Player/json_store/playback.json",
 
-refreshFrequency: 100,
+refreshFrequency: 500,
 
 render: function (output) {
   return `
@@ -18,7 +18,7 @@ render: function (output) {
 update: function(output, domEl) {
   try {
     let state = JSON.parse(output);
-    let albumArt = state.song.albumArt;
+    let albumArt = state.song.albumArt.substring(0, state.song.albumArt.lastIndexOf('='));
     let progress = (state.time.current / state.time.total) * 100;
 
     domEl.querySelector('#container').style.backgroundImage = `url('${albumArt}')`
