@@ -60,7 +60,7 @@ style: `
     height: 350px
     width: 350px
 
-    background-color: #000000
+    background-color: rgba(0, 0, 0, 0.8)
     background-size: cover
 
     border-radius: 8px
