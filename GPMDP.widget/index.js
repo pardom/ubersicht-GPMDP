@@ -1,15 +1,21 @@
-command: "cat ~/Library/Application\\ Support/Google\\ Play\\ Music\\ Desktop\\ Player/json_store/playback.json",
+command: 'cat ~/Library/Application\\ Support/Google\\ Play\\ Music\\ Desktop\\ Player/json_store/playback.json',
 
 refreshFrequency: 500,
 
 render: function (output) {
   return `
-    <div id="container">
-      <div id="overlay">
-        <span id="artist"></span>
-        <span id="album"></span>
-        <span id="title"></span>
-        <div id="progress" />
+    <div id='container'>
+      <div id='controls'>
+        <img id='prev' src='GPMDP.widget/images/ic_skip_previous.svg' /></a>
+        <img id='play' src='GPMDP.widget/images/ic_play_arrow.svg' />
+        <img id='pause' src='GPMDP.widget/images/ic_pause.svg' />
+        <img id='next' src='GPMDP.widget/images/ic_skip_next.svg' />
+      </div>
+      <div id='overlay'>
+        <span id='artist'></span>
+        <span id='album'></span>
+        <span id='title'></span>
+        <div id='progress' />
       </div>
     </div>
   `;
@@ -18,14 +24,25 @@ render: function (output) {
 update: function(output, domEl) {
   try {
     let state = JSON.parse(output);
-    let albumArt = state.song.albumArt.substring(0, state.song.albumArt.lastIndexOf('='));
+    let active = state.time.total > 0;
     let progress = (state.time.current / state.time.total) * 100;
+    let albumArt = state.song.albumArt != null
+        ? state.song.albumArt.substring(0, state.song.albumArt.lastIndexOf('='))
+        : '';
 
-    domEl.querySelector('#container').style.backgroundImage = `url('${albumArt}')`
-    domEl.querySelector('#artist').innerText = state.song.artist
-    domEl.querySelector('#album').innerText = state.song.album
-    domEl.querySelector('#title').innerText = state.song.title
-    domEl.querySelector('#progress').style.width = `${progress}%`
+    // Visibility
+    domEl.style.display = active ? 'initial' : 'none';
+
+    // Controls
+    domEl.querySelector('#play').style.display = state.playing ? 'none' : 'initial';
+    domEl.querySelector('#pause').style.display = state.playing ? 'initial' : 'none';
+
+    // Overlay
+    domEl.querySelector('#container').style.backgroundImage = `url('${albumArt}')`;
+    domEl.querySelector('#artist').innerText = state.song.artist;
+    domEl.querySelector('#album').innerText = state.song.album;
+    domEl.querySelector('#title').innerText = state.song.title;
+    domEl.querySelector('#progress').style.width = `${progress}%`;
   } catch (err) {
     // Failure to parse
   }
@@ -38,12 +55,12 @@ style: `
   #container
     display: flex
     flex-direction: column
-    justify-content: flex-end
     overflow: hidden
 
     height: 350px
     width: 350px
 
+    background-color: #000000
     background-size: cover
 
     border-radius: 8px
@@ -70,6 +87,24 @@ style: `
     font-size: 24px
     color: rgba(255, 255, 255, 1)
     padding: 5px 10px 15px 10px
+
+  #controls
+    display: flex
+    flex-direction: row
+    justify-content: space-around
+    flex: 1
+    padding: 20px 50px
+
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+
+    opacity: 0
+
+    img
+      height: 50px
+
+  #container:hover #controls
+      opacity: 1
+      transition: all 0.2s ease-in-out;
 
   #overlay
     background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
