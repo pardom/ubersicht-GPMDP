@@ -22,13 +22,18 @@ render: function (output) {
 },
 
 update: function(output, domEl) {
+  function normalizeAlbumArtUrl(url) {
+    if (url == null) return '';
+    let dimenPart = url.lastIndexOf('=');
+    let end = dimenPart >= 0 ? dimenPart : url.length;
+    return url.substring(0, end);
+  }
+
   try {
     let state = JSON.parse(output);
     let active = state.time.total > 0;
     let progress = (state.time.current / state.time.total) * 100;
-    let albumArt = state.song.albumArt != null
-        ? state.song.albumArt.substring(0, state.song.albumArt.lastIndexOf('='))
-        : '';
+    let albumArt = normalizeAlbumArtUrl(state.song.albumArt);
 
     // Visibility
     domEl.style.display = active ? 'initial' : 'none';
